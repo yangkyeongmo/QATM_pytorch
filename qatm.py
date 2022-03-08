@@ -5,12 +5,15 @@ from torchvision import models, transforms, utils
 import argparse
 from utils import *
 
+import time
+
 # +
 # import functions and classes from qatm_pytorch.py
 print("import qatm_pytorch.py...")
 import ast
 import types
 import sys
+
 
 with open("qatm_pytorch.py") as f:
        p = ast.parse(f.read())
@@ -43,10 +46,13 @@ if __name__ == '__main__':
     print("define model...")
     model = CreateModel(model=models.vgg19(pretrained=True).features, alpha=args.alpha, use_cuda=args.cuda)
     print("calculate score...")
-    scores, w_array, h_array, thresh_list = run_multi_sample(model, dataset)
-    print("nms...")
-    boxes, indices = nms_multi(scores, w_array, h_array, thresh_list)
-    _ = plot_result_multi(dataset.image_raw, boxes, indices, show=False, save_name='result.png')
-    print("result.png was saved")
+    for _ in range(5):
+        start_time = time.time()
+        scores, w_array, h_array, thresh_list = run_multi_sample(model, dataset)
+        print("nms...")
+        print(f'took {time.time() - start_time}s.')
+        boxes, indices = nms_multi(scores, w_array, h_array, thresh_list)
+        _ = plot_result_multi(dataset.image_raw, boxes, indices, show=False, save_name='result.png')
+        print("result.png was saved")
 
 
